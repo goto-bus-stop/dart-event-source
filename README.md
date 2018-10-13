@@ -1,4 +1,4 @@
-# event_source
+# w3c_event_source
 
 W3C [EventSource][] client implementation for Dart / Flutter.
 
@@ -11,14 +11,14 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  event_source: ^1.0.0
+  w3c_event_source: ^1.0.0
 ```
 
 ## Usage
 
 ```dart
 import 'dart:async';
-import 'package:event_source/event_source.dart';
+import 'package:w3c_event_source/event_source.dart';
 
 final events = EventSource(Uri.parse('http://api.example.com/ssedemo.php'));
 

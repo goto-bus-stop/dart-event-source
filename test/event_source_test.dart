@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:test/test.dart';
-import 'package:event_source/event_source.dart';
+import 'package:w3c_event_source/event_source.dart';
 
 List<String> _responses = [];
 
