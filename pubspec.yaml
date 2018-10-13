@@ -3,3 +3,8 @@ version: 0.0.1
 description: W3C EventSource client implementation for Dart
 author: Renée Kooi <renee@kooi.me>
 homepage: https://github.com/goto-bus-stop/dart-event-source
+
+environment:
+  sdk: ">=2.0.0 <3.0.0"
+dev_dependencies:
+  test: any
