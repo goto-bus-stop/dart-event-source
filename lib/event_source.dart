@@ -1,4 +1,4 @@
-import 'dart:async' show Future, Stream, StreamController;
+import 'dart:async' show Future, Stream, StreamController, Timer;
 import 'dart:io' show HttpClient;
 import 'dart:convert' show LineSplitter, utf8;
 
@@ -36,7 +36,10 @@ class EventSource {
   int _readyState = CLOSED;
 
   /// Time in ms to wait before reconnecting.
-  int _reconnectTime = 3000;
+  Duration _reconnectTime = const Duration(seconds: 3);
+
+  /// Timer used while waiting to reconnect.
+  Timer _reconnecting;
 
   /// The last-seen event ID, used when reconnecting.
   String _lastEventID;
@@ -71,6 +74,10 @@ class EventSource {
   /// Opens the connection. Once the returned Future completes, events will start coming in on the `.events` attribute.
   Future<Null> open() async {
     if (_readyState != CLOSED) return;
+    if (_reconnecting != null) { 
+      _reconnecting.cancel();
+      _reconnecting = null;
+    }
 
     _readyState = CONNECTING;
 
@@ -86,6 +93,9 @@ class EventSource {
     _readyState = OPEN;
 
     response
+        .handleError((_) {
+          _reconnect();
+        })
         .transform(utf8.decoder)
         .transform(LineSplitter())
         .listen(_onMessage);
@@ -94,11 +104,29 @@ class EventSource {
   /// Closes the connection, if any, and sets the `readyState` attribute to `CLOSED`.
   /// If the connection is already closed, the method does nothing.
   void close() {
+    if (_reconnecting != null) {
+      _reconnecting.cancel();
+      _reconnecting = null;
+    }
+
     if (_readyState != CLOSED) {
       _client.close();
       _client = null;
       _readyState = CLOSED;
     }
+  }
+
+  /// Start a reconnect timer.
+  void _reconnect() {
+    close();
+    _reconnecting = Timer(_reconnectTime, () {
+      _reconnecting = null;
+      if (_readyState == CLOSED) {
+        open().catchError((err) {
+          _reconnect();
+        });
+      }
+    });
   }
 
   /// Process a partial message (a line).
@@ -142,7 +170,9 @@ class EventSource {
     } else if (name == 'id') {
       _lastEventID = value;
     } else if (name == 'retry') {
-      _reconnectTime = int.parse(value, radix: 10);
+      _reconnectTime = Duration(
+        milliseconds: int.parse(value, radix: 10),
+      );
     }
   }
 }
