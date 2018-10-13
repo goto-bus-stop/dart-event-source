@@ -1,5 +1,13 @@
 # w3c_event_source
 
+[![pub package][0]][1]
+[![build status][2]][3]
+
+[0]: https://img.shields.io/pub/v/w3c_event_source.svg?style=flat-square
+[1]: https://pub.dartlang.org/packages/w3c_event_source
+[2]: https://img.shields.io/travis/com/goto-bus-stop/dart-event-source/default.svg?style=flat-square
+[3]: https://travis-ci.com/goto-bus-stop/dart-event-source
+
 W3C [EventSource][] client implementation for Dart / Flutter.
 
 > This package depends on `dart:io`, so it is not usable on the Web.
