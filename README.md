@@ -2,6 +2,9 @@
 
 W3C [EventSource][] client implementation for Dart / Flutter.
 
+> This package depends on `dart:io`, so it is not usable on the Web.
+> If you'd like to contribute a wrapper around [`dart:html`'s EventSource](https://api.dartlang.org/stable/2.0.0/dart-html/EventSource-class.html), feel free!
+
 ## Install
 
 Add to your `pubspec.yaml`:
