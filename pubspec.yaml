@@ -1,5 +1,5 @@
 name: w3c_event_source
-version: 0.0.1
+version: 1.0.0
 description: W3C EventSource client implementation for Dart
 author: Renée Kooi <renee@kooi.me>
 homepage: https://github.com/goto-bus-stop/dart-event-source
