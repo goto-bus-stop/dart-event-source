@@ -1,5 +1,5 @@
 import 'dart:async' show Future, Stream, StreamController;
-import 'dart:io' show HttpClient, Socket, SocketOption;
+import 'dart:io' show HttpClient;
 import 'dart:convert' show LineSplitter, utf8;
 
 class MessageEvent {
