@@ -1,5 +1,5 @@
 name: w3c_event_source
-version: 1.0.0
+version: 1.1.0
 description: W3C EventSource client implementation for Dart / Flutter,
   to communicate with server-sent event endpoints.
 author: Renée Kooi <renee@kooi.me>
