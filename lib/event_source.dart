@@ -172,11 +172,9 @@ class EventSource {
       _nextEventName = value;
     } else if (name == 'data') {
       if (_nextData == null) {
-        _nextData = value;
-      } else {
-        _nextData += '\n$value';
+        _nextData = '';
       }
-      _nextEventName = null;
+      _nextData += '$value\n';
     } else if (name == 'id') {
       _lastEventID = value;
     } else if (name == 'retry') {
