@@ -26,7 +26,7 @@ void main() {
   });
 
   test('opens and closes connection when listening on `events`', () async {
-    final data = 'example data';
+    final data = 'example data\n';
 
     _responses = [
       'retry:10000',
@@ -55,7 +55,7 @@ void main() {
     final second = events.elementAt(1);
 
     final message = await first;
-    expect(message.data, equals('example'));
+    expect(message.data, equals('example\n'));
 
     // Kill the connection
     final port = server.port;
@@ -68,6 +68,6 @@ void main() {
     });
 
     final message2 = await second;
-    expect(message2.data, equals('back'));
+    expect(message2.data, equals('back\n'));
   });
 }
