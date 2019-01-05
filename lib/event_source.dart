@@ -9,6 +9,8 @@ class MessageEvent {
   MessageEvent({this.name, this.data});
 }
 
+typedef HttpClientFactory = HttpClient Function();
+
 /// A client for server-sent events. An EventSource instance opens a persistent connection to an HTTP server, which sends events in `text/event-stream` format.
 class EventSource {
   /// Event name for a block in case no `event:` line was seen.
@@ -50,6 +52,9 @@ class EventSource {
   /// The data value for the current block.
   String _nextData;
 
+  /// The function used to create HttpClient when connecting.
+  HttpClientFactory clientFactory;
+
   /// The URL of the EventSource endpoint.
   final Uri url;
 
@@ -60,7 +65,12 @@ class EventSource {
   Stream<MessageEvent> get events => _streamController.stream;
 
   /// Create an EventSource for a given remote URL.
-  EventSource(this.url) {
+  EventSource(this.url, {this.clientFactory}) {
+    if (clientFactory == null) {
+      clientFactory = () {
+        return HttpClient();
+      };
+    }
     _streamController = StreamController.broadcast(
       onListen: () {
         open();
@@ -81,7 +91,7 @@ class EventSource {
 
     _readyState = CONNECTING;
 
-    _client = HttpClient();
+    _client = clientFactory();
 
     final request = await _client.getUrl(url);
     request.headers.set('Accept', _MIME_TYPE);
