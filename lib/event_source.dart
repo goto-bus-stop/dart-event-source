@@ -166,7 +166,6 @@ class EventSource {
       } else {
         _nextData += '\n$value';
       }
-      _nextEventName = null;
     } else if (name == 'id') {
       _lastEventID = value;
     } else if (name == 'retry') {
