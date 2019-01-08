@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.2.2
+* Revert `data` event commit, which was a misreading of the spec. ([@mpx](https://github.com/mpx) in [#4](https://github.com/goto-bus-stop/dart-event-source/pull/4))
+
 ## 1.2.1
 * Ensure `data` event data ends in \n per the spec. ([@mpx](https://github.com/mpx) in [#2](https://github.com/goto-bus-stop/dart-event-source/pull/3))
 * Fix event name bug in multiline data messages. ([@mpx](https://github.com/mpx) in [#2](https://github.com/goto-bus-stop/dart-event-source/pull/3))
