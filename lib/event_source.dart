@@ -100,15 +100,19 @@ class EventSource {
     }
 
     final response = await request.close();
+    if (response.statusCode != 200) {
+      _reconnect();
+      return;
+    }
+
     _readyState = OPEN;
 
     response
-        .handleError((_) {
-          _reconnect();
-        })
         .transform(utf8.decoder)
         .transform(LineSplitter())
-        .listen(_onMessage);
+        .listen(_onMessage, onDone: _reconnect, onError: (_) {
+      _reconnect();
+    });
   }
 
   /// Closes the connection, if any, and sets the `readyState` attribute to `CLOSED`.
