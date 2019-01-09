@@ -1,5 +1,5 @@
 import 'dart:async' show Future, Stream, StreamController, Timer;
-import 'dart:io' show HttpClient;
+import 'dart:io' show HttpClient, HttpStatus;
 import 'dart:convert' show LineSplitter, utf8;
 
 class MessageEvent {
@@ -100,7 +100,11 @@ class EventSource {
     }
 
     final response = await request.close();
-    if (response.statusCode != 200) {
+    if (response.statusCode == HttpStatus.noContent) {
+      close();
+      return;
+    }
+    if (response.statusCode != HttpStatus.ok) {
       _reconnect();
       return;
     }
