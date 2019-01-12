@@ -1,6 +1,7 @@
 import 'dart:async' show Future, Stream, StreamController, Timer;
-import 'dart:io' show HttpClient, HttpStatus;
 import 'dart:convert' show LineSplitter, utf8;
+import 'dart:io' show HttpClient, HttpStatus;
+import 'dart:math' show Random;
 
 class MessageEvent {
   final String name;
@@ -31,14 +32,23 @@ class EventSource {
   /// Client used for the request.
   HttpClient _client;
 
+  /// Random number sequence for exponential backoff.
+  final Random _random = Random();
+
   /// Data controller for the `.events` attribute.
   StreamController<MessageEvent> _streamController;
 
   /// Mutable readyState.
   int _readyState = CLOSED;
 
-  /// Time in ms to wait before reconnecting.
-  Duration _reconnectTime = const Duration(seconds: 3);
+  /// Time to wait for reconnect after a successful connection.
+  Duration initialReconnectDelay;
+
+  /// Maximum time to wait before reconnecting.
+  final Duration maxReconnectDelay;
+
+  /// Time to wait before next reconnection, null represents initial timout.
+  Duration _reconnectDelay;
 
   /// Timer used while waiting to reconnect.
   Timer _reconnecting;
@@ -65,7 +75,13 @@ class EventSource {
   Stream<MessageEvent> get events => _streamController.stream;
 
   /// Create an EventSource for a given remote URL.
-  EventSource(this.url, {this.clientFactory}) {
+  EventSource(this.url,
+      {this.clientFactory,
+      this.initialReconnectDelay = const Duration(seconds: 1),
+      this.maxReconnectDelay = const Duration(minutes: 1)})
+      : assert(url != null),
+        assert(initialReconnectDelay != null),
+        assert(maxReconnectDelay != null) {
     if (clientFactory == null) {
       clientFactory = () {
         return HttpClient();
@@ -110,12 +126,16 @@ class EventSource {
     }
 
     _readyState = OPEN;
+    _reconnectDelay = null;
 
+    // One or both of "done" and "error" events can trigger. Ensure reconnect
+    // is only called once per connection.
+    var reconnectOnce = _onceFunc(_reconnect);
     response
         .transform(utf8.decoder)
         .transform(LineSplitter())
-        .listen(_onMessage, onDone: _reconnect, onError: (_) {
-      _reconnect();
+        .listen(_onMessage, onDone: reconnectOnce, onError: (_) {
+      reconnectOnce();
     });
   }
 
@@ -137,7 +157,8 @@ class EventSource {
   /// Start a reconnect timer.
   void _reconnect() {
     close();
-    _reconnecting = Timer(_reconnectTime, () {
+    _reconnectDelay ??= initialReconnectDelay;
+    _reconnecting = Timer(_reconnectDelay, () {
       _reconnecting = null;
       if (_readyState == CLOSED) {
         open().catchError((err) {
@@ -145,6 +166,10 @@ class EventSource {
         });
       }
     });
+    _reconnectDelay *= 1.5 + _random.nextDouble();
+    if (_reconnectDelay > maxReconnectDelay) {
+      _reconnectDelay = maxReconnectDelay;
+    }
   }
 
   /// Process a partial message (a line).
@@ -187,9 +212,24 @@ class EventSource {
     } else if (name == 'id') {
       _lastEventID = value;
     } else if (name == 'retry') {
-      _reconnectTime = Duration(
-        milliseconds: int.parse(value, radix: 10),
-      );
+      try {
+        final Duration d = Duration(
+          milliseconds: int.parse(value, radix: 10),
+        );
+        initialReconnectDelay = d;
+      } catch (_) {
+        _reconnect();
+      }
     }
   }
+}
+
+/// Adapt a function so it will only be called once.
+Function _onceFunc(Function f) {
+  bool done = false;
+  return () {
+    if (done) return;
+    done = true;
+    f();
+  };
 }
