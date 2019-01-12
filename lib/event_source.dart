@@ -100,7 +100,7 @@ class EventSource {
   /// Opens the connection. Once the returned Future completes, events will start coming in on the `.events` attribute.
   Future<Null> open() async {
     if (_readyState != CLOSED) return;
-    if (_reconnecting != null) { 
+    if (_reconnecting != null) {
       _reconnecting.cancel();
       _reconnecting = null;
     }
