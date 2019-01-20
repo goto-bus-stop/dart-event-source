@@ -148,7 +148,7 @@ class EventSource {
     }
 
     if (_readyState != CLOSED) {
-      _client.close();
+      _client.close(force: true);
       _client = null;
       _readyState = CLOSED;
     }
