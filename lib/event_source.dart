@@ -67,6 +67,9 @@ class EventSource {
 
   /// The URL of the EventSource endpoint.
   final Uri url;
+  
+  /// Basic authorization
+  final String authentication;
 
   /// A number representing the state of the connection.
   int get readyState => _readyState;
@@ -76,7 +79,8 @@ class EventSource {
 
   /// Create an EventSource for a given remote URL.
   EventSource(this.url,
-      {this.clientFactory,
+      {this.authentication,
+      this.clientFactory,
       this.initialReconnectDelay = const Duration(seconds: 1),
       this.maxReconnectDelay = const Duration(minutes: 1)})
       : assert(url != null),
@@ -111,6 +115,9 @@ class EventSource {
 
     final request = await _client.getUrl(url);
     request.headers.set('Accept', _MIME_TYPE);
+    if (authentication != null) {
+      request.headers.set('Authorization', authentication);
+    }
     if (_lastEventID != null) {
       request.headers.set('Last-Event-ID', _lastEventID);
     }
