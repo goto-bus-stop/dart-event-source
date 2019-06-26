@@ -132,6 +132,7 @@ class EventSource {
     // is only called once per connection.
     var reconnectOnce = _onceFunc(_reconnect);
     response
+        .cast<List<int>>()
         .transform(utf8.decoder)
         .transform(LineSplitter())
         .listen(_onMessage, onDone: reconnectOnce, onError: (_) {
