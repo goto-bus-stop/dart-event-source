@@ -131,7 +131,7 @@ class EventSource {
     // One or both of "done" and "error" events can trigger. Ensure reconnect
     // is only called once per connection.
     var reconnectOnce = _onceFunc(_reconnect);
-    uf8.decoder
+    utf8.decoder
         .bind(response)
         .transform(LineSplitter())
         .listen(_onMessage, onDone: reconnectOnce, onError: (_) {
