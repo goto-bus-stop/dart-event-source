@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.3.2
+* Prepare for upcoming Uint8List change to HttpClientResponse. ([@tvolkert](https://github.com/tvolkert))
+
 ## 1.3.1
 * Prepare for upcoming change to HttpRequest and HttpClientResponse. ([@tvolkert](https://github.com/tvolkert))
 

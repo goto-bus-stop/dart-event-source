@@ -19,7 +19,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  w3c_event_source: ^1.3.1
+  w3c_event_source: ^1.3.2
 ```
 
 ## Usage
