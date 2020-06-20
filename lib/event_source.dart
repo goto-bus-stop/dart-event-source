@@ -62,6 +62,9 @@ class EventSource {
   /// The data value for the current block.
   String _nextData;
 
+  /// Headers, to supply with http request
+  Map<String, String> headers;
+
   /// The function used to create HttpClient when connecting.
   HttpClientFactory clientFactory;
 
@@ -77,6 +80,7 @@ class EventSource {
   /// Create an EventSource for a given remote URL.
   EventSource(this.url,
       {this.clientFactory,
+      this.headers,
       this.initialReconnectDelay = const Duration(seconds: 1),
       this.maxReconnectDelay = const Duration(minutes: 1)})
       : assert(url != null),
@@ -110,6 +114,11 @@ class EventSource {
     _client = clientFactory();
 
     final request = await _client.getUrl(url);
+    if (headers != null) {
+      headers.forEach((key, value) {
+        request.headers.set(key, value);
+      });
+    }
     request.headers.set('Accept', _MIME_TYPE);
     if (_lastEventID != null) {
       request.headers.set('Last-Event-ID', _lastEventID);
